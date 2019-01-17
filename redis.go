@@ -53,10 +53,13 @@ func (c *Cache) Set(item *Item) error {
 	if err != nil {
 		return errors.Wrap(err, "marshal failed")
 	}
+
 	conn, err := c.getConn()
 	if err != nil {
 		return errors.Wrap(err, "getConn failed")
 	}
+	defer conn.Close()
+
 	expire := item.Expiration
 	if item.Expiration < time.Second {
 		expire = 2 * time.Minute
@@ -77,6 +80,8 @@ func (c *Cache) Get(key string, object interface{}) error {
 	if err != nil {
 		return errors.Wrap(err, "getConn failed")
 	}
+	defer conn.Close()
+
 	b, err := redis.Bytes(conn.Do("GET", key))
 	if err != nil {
 		if err == redis.ErrNil {
