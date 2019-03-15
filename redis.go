@@ -16,8 +16,8 @@ type UnmarshalFunc func([]byte, interface{}) error
 
 type Cache struct {
 	Redis     *redis.Pool
-	Marshal   func(interface{}) ([]byte, error)
-	Unmarshal func([]byte, interface{}) error
+	Marshal   MarshalFunc
+	Unmarshal UnmarshalFunc
 
 	conn   redis.Conn
 	hits   uint64
