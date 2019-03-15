@@ -19,7 +19,6 @@ type Cache struct {
 	Marshal   func(interface{}) ([]byte, error)
 	Unmarshal func([]byte, interface{}) error
 
-	conn   redis.Conn
 	hits   uint64
 	misses uint64
 }
@@ -39,13 +38,12 @@ func NewRedisCache(redis *redis.Pool, marshalFunc MarshalFunc, unmarshalFunc Unm
 }
 
 func (c *Cache) getConn() (redis.Conn, error) {
-	if c.conn == nil {
-		conn := c.Redis.Get()
-		if err := conn.Err(); err != nil {
-			return conn, errors.WithStack(err)
-		}
+	conn := c.Redis.Get()
+	if err := conn.Err(); err != nil {
+		return conn, errors.WithStack(err)
 	}
-	return c.conn, nil
+
+	return conn, nil
 }
 
 func (c *Cache) Set(item *Item) error {
